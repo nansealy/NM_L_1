@@ -89,8 +89,6 @@ public class Main {
     public static void ToSymmetric(double[][] matrix, double[] vector){
         // приведение СЛАУ к симметричному виду
         double[][] transposeMatrix = MatrixTranspose(matrix);
-        //matrix = Arrays.copyOf(MatrixMultiply(transposeMatrix, matrix), matrix.length);
-        //vector = Arrays.copyOf(MatrixVectorMultiply(transposeMatrix, vector), vector.length);
         System.arraycopy(MatrixMultiply(transposeMatrix, matrix), 0, matrix, 0, matrix.length);
         System.arraycopy(MatrixVectorMultiply(transposeMatrix, vector), 0, vector, 0, vector.length);
     }
@@ -119,12 +117,34 @@ public class Main {
         return x;
     }
 
-    /*public static double[] CholetskyMethodSolve(double[][] matrix, double[] vector){
-        // решение СЛАУ методом Холецкого
+    public static double[][] CholetskyMethodSolve(double[][] matrix, double[] vector){ // поменять на double[], изменено для тестирования
+        // решение СЛАУ методом Холецкого, НЕ РАБОТАЕТ!!!
+        ToSymmetric(matrix, vector); // приведение к симметричному виду, ТОЧНО РАБОТАЕТ!!!
+        System.out.println("Матрица A:");
+        OutputMatrix(matrix);
+        System.out.println("Вектор B:");
+        OutputVector(vector);
 
         int n = vector.length;
-
-    }*/
+        double s;
+        for(int k = 0; k < n; k++){
+            for(int i = 0; i < k; i++){
+                s = 0;
+                for(int j = 0; j < i; j++) {
+                    s = s + matrix[i][j]*matrix[k][j];
+                }
+                matrix[k][i] = (matrix[k][i] - s)/matrix[i][i];
+            }
+            s = 0;
+            for(int j = 0; j < k; j++)
+                s = s + matrix[k][j]*matrix[k][j];
+            matrix[k][k] = Math.sqrt(matrix[k][k] - s);
+        }
+        // алгоритм приведения к двум треугольным матрицам завершен
+        // на этом моменте нам нужно решить две системы уравнений, каким образом - непонятно
+        // по идее, у нас уже есть некий x[3] или x[1]
+        return matrix;
+    }
 
     public static void main(String[] args) {
         /*int m, n; // размерность матрицы
@@ -150,13 +170,12 @@ public class Main {
         OutputMatrix(matrixA);
         System.out.println("Вектор B:");
         OutputVector(vectorB);
+
         /*System.out.println("Решение методом Гаусса:");
         OutputVector(GaussMethodSolve(matrixA, vectorB));*/
-        ToSymmetric(matrixA, vectorB);
-        System.out.println("Приведение к симметричному виду...");
-        System.out.println("Матрица A:");
-        OutputMatrix(matrixA);
-        System.out.println("Вектор B:");
-        OutputVector(vectorB);
+
+        System.out.println("Преобразование матрицы методом Холецкого...");
+        System.out.println("Матрица:");
+        OutputMatrix(CholetskyMethodSolve(matrixA, vectorB));
     }
 }
