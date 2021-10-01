@@ -1,5 +1,6 @@
 package com.company;
 
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
@@ -85,11 +86,13 @@ public class Main {
         }
     }
 
-    public static void ToSymmetric(double[][] matrix, double[] vector){ // не работает, объект по ссылке не меняется..
+    public static void ToSymmetric(double[][] matrix, double[] vector){
         // приведение СЛАУ к симметричному виду
         double[][] transposeMatrix = MatrixTranspose(matrix);
-        matrix = MatrixMultiply(transposeMatrix, matrix);
-        vector = MatrixVectorMultiply(transposeMatrix, vector);
+        //matrix = Arrays.copyOf(MatrixMultiply(transposeMatrix, matrix), matrix.length);
+        //vector = Arrays.copyOf(MatrixVectorMultiply(transposeMatrix, vector), vector.length);
+        System.arraycopy(MatrixMultiply(transposeMatrix, matrix), 0, matrix, 0, matrix.length);
+        System.arraycopy(MatrixVectorMultiply(transposeMatrix, vector), 0, vector, 0, vector.length);
     }
 
     public static double[] GaussMethodSolve(double[][] matrix, double[] vector){
