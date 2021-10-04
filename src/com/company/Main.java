@@ -135,9 +135,10 @@ public class Main {
                 }
                 matrix[k][i] = (matrix[k][i] - s)/matrix[i][i];
             }
+            System.out.println();
             s = 0;
             for(int j = 0; j < k; j++)
-                s = s + matrix[k][j]*matrix[k][j];
+                s = s + Math.pow(matrix[k][j],2);
             matrix[k][k] = Math.sqrt(matrix[k][k] - s);
         }
         // алгоритм приведения к двум треугольным матрицам завершен
