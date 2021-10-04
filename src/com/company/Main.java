@@ -52,6 +52,51 @@ public class Main {
         return resMatrix;
     }
 
+    public static double[][] MatrixInverse(double [][] matrix){
+        // получение обратной матрицы
+        int n = matrix.length;
+        double buf;
+        double[][] unitMatrix = new double[n][n]; // единичная матрица
+        double[][] invMatrix = new double[n][n]; // результирующая матрица
+        System.arraycopy(matrix, 0, invMatrix, 0, n);
+
+        for(int i = 0; i < n; i++)
+            unitMatrix[i][i] = 1; // заполнение главной диагонали единицами
+
+        for(int k = 0; k < n; k++){
+            buf = invMatrix[k][k];
+            for(int j = 0; j < n; j++){
+                invMatrix[k][j] /= buf;
+                unitMatrix[k][j] /= buf;
+            }
+            for(int i = k + 1; i < n; i++){
+                buf = invMatrix[i][k];
+                for(int j = 0; j < n; j++){
+                    invMatrix[i][j] -= invMatrix[k][j] * buf;
+                    unitMatrix[i][j] -= unitMatrix[k][j] * buf;
+                }
+            }
+        }
+
+        for (int k = n - 1; k > 0; k--) {
+            for (int i = k - 1; i >= 0; i--) {
+                buf = invMatrix[i][k];
+                for (int j = 0; j < n; j++) {
+                    invMatrix[i][j] -= invMatrix[k][j] * buf;
+                    unitMatrix[i][j] -= unitMatrix[k][j] * buf;
+                }
+            }
+        }
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                invMatrix[i][j] = unitMatrix[i][j];
+            }
+        }
+
+        return invMatrix;
+    }
+
     public static double[][] MatrixMultiply(double[][] matrixA, double [][] matrixB) throws IllegalArgumentException {
         // умножение матриц
         if(matrixA[0].length == matrixB.length){
@@ -124,7 +169,7 @@ public class Main {
         OutputMatrix(matrix);
         System.out.println("Вектор B:");
         OutputVector(vector);
-
+        double[][] l_matrix = new double[vector.length][vector.length];
         int n = vector.length;
         double s;
         for(int k = 0; k < n; k++){
@@ -141,10 +186,20 @@ public class Main {
                 s = s + Math.pow(matrix[k][j],2);
             matrix[k][k] = Math.sqrt(matrix[k][k] - s);
         }
+        for(int i =0; i<vector.length;i++){
+            for (int j =0; j<=i;j++){
+                l_matrix[i][j] = matrix[i][j];
+            }
+        }
         // алгоритм приведения к двум треугольным матрицам завершен
         // на этом моменте нам нужно решить две системы уравнений, каким образом - непонятно
         // по идее, у нас уже есть некий x[3] или x[1]
-        return matrix;
+
+
+
+        l_matrix = MatrixTranspose(l_matrix);
+
+        return l_matrix;
     }
 
     public static void main(String[] args) {
@@ -175,8 +230,7 @@ public class Main {
         /*System.out.println("Решение методом Гаусса:");
         OutputVector(GaussMethodSolve(matrixA, vectorB));*/
 
-        System.out.println("Преобразование матрицы методом Холецкого...");
-        System.out.println("Матрица:");
-        OutputMatrix(CholetskyMethodSolve(matrixA, vectorB));
+        System.out.println("Обратная матрица:");
+        OutputMatrix(MatrixInverse(matrixA));
     }
 }
