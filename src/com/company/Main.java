@@ -152,12 +152,16 @@ public class Main {
 
     public static double[] GaussMethodSolve(double[][] matrix, double[] vector){
         // решение СЛАУ методом Гаусса
+
         int n = vector.length;
         double c, s;
         double[] x = new double[n];
+
+        // создание копий массивов:
         double[][] matrixCopy = MatrixCopy(matrix);
         double[] vectorCopy = Arrays.copyOf(vector, n);
 
+        // прямой ход:
         for(int i = 0; i < n - 1; i++){
             for(int k = i + 1; k < n; k++){
                 c = matrixCopy[k][i]/matrixCopy[i][i];
@@ -167,6 +171,8 @@ public class Main {
                 vectorCopy[k] = vectorCopy[k] - c * vectorCopy[i];
             }
         }
+
+        // обратный ход:
         x[n - 1] = vectorCopy[n - 1]/matrixCopy[n - 1][n - 1];
         for(int i = n - 1; i >= 0; i--){
             s = 0;
@@ -178,22 +184,20 @@ public class Main {
     }
 
     public static double[] CholetskyMethodSolve(double[][] matrix, double[] vector){
-        // решение СЛАУ методом Холецкого, НЕ РАБОТАЕТ!!!
+        // решение СЛАУ методом Холецкого
+
         int n = vector.length;
         double s;
+
+        // создание копий массивов:
         double[][] matrixCopy = MatrixCopy(matrix);
         double[] vectorCopy = Arrays.copyOf(vector, n);
+
         double[][] l_matrix = new double[n][n];
         double[] y = new double[n];
         double[] x;
 
         ToSymmetric(matrixCopy, vectorCopy); // приведение к симметричному виду
-/*
-        System.out.println("MatrixCopy после приведения к симметричному виду:");
-        OutputMatrix(matrixCopy);
-        System.out.println("VectorCopy после приведения к симметричному виду:");
-        OutputVector(vectorCopy);
-*/
 
         for(int k = 0; k < n; k++){
             for(int i = 0; i < k; i++){
@@ -201,79 +205,36 @@ public class Main {
                 for(int j = 0; j < i; j++) {
                     s = s + matrixCopy[i][j] * matrixCopy[k][j];
                 }
-                matrixCopy[k][i] = (matrixCopy[k][i] - s)/matrixCopy[i][i];
+                matrixCopy[k][i] = (matrixCopy[k][i] - s)/matrixCopy[i][i]; // вычисление значений под главной диагональю
             }
             s = 0;
             for(int j = 0; j < k; j++)
                 s = s + Math.pow(matrixCopy[k][j],2);
-            matrixCopy[k][k] = Math.sqrt(matrixCopy[k][k] - s);
+            matrixCopy[k][k] = Math.sqrt(matrixCopy[k][k] - s); // вычисление диагональных значений
         }
 
-        for(int i = 0; i < n; i++){
+        for(int i = 0; i < n; i++){ // копирование треугольной матрицы
             for (int j = 0; j <= i; j++){
                 l_matrix[i][j] = matrixCopy[i][j];
             }
         }
-/*
-        System.out.println("Матрица L:");
-        OutputMatrix(l_matrix);
-*/
-        // алгоритм приведения к двум треугольным матрицам завершен
 
-         /*
-        l_matrix = MatrixTranspose(l_matrix);
+        // алгоритм приведения к треугольной матрице завершен
 
-
-        System.out.println("Матрица LT:");
-        OutputMatrix(l_matrix); */
-
-        /*
-        y[n - 1] = vector[n - 1]/l_matrix[n - 1][n - 1]; // используем обратный ход аналогично методу Гаусса
-        for(int i = n - 1; i >= 0; i--){
-            s = 0;
-            for(int j = i + 1; j < n; j++)
-                s += l_matrix[i][j] * y[j];
-            y[i] = (vector[i] - s)/l_matrix[i][i];
-        }
-        x = MatrixVectorMultiply(MatrixInverse(MatrixTranspose(l_matrix)), y);
-
-         */
-
-        y[0] = vectorCopy[0]/l_matrix[0][0]; // используем обратный ход аналогично методу Гаусса
+        y[0] = vectorCopy[0]/l_matrix[0][0]; // вычисление y0
         for(int i = 1; i < n; i++){
             s = 0;
             for(int j = i - 1; j >= 0; j--)
                 s += l_matrix[i][j] * y[j];
-            y[i] = (vectorCopy[i] - s)/l_matrix[i][i];
+            y[i] = (vectorCopy[i] - s)/l_matrix[i][i]; // последовательное вычисление остальных y
         }
-        x = MatrixVectorMultiply(MatrixInverse(MatrixTranspose(l_matrix)), y);
-/*
-        System.out.println("Вектор Y:");
-        OutputVector(y);
 
-        System.out.println("Вектор X:");
-        OutputVector(x);
-*/
+        x = MatrixVectorMultiply(MatrixInverse(MatrixTranspose(l_matrix)), y); // решение уравнение LT*x=y
+
         return x;
     }
 
     public static void main(String[] args) {
-        /*int m, n; // размерность матрицы
-        Scanner in = new Scanner(System.in);
-        System.out.print("Введите m: ");
-        m = in.nextInt();
-        System.out.print("Введите n: ");
-        n = in.nextInt();
-        double [][] matrixA = new double[m][n];
-        System.out.println("Заполните матрицу:");
-        InputMatrix(matrixA);
-        System.out.println("Матрица:");
-        OutputMatrix(matrixA);
-        System.out.println("Заполните вектор:");
-        in.nextLine();
-        double [] vectorB = LineToArr(in.nextLine());
-        OutputVector(vectorB);*/
-
 
         double [][] matrixA = {{3.40, 3.26, 2.90}, {2.64, 2.39, 1.96}, {4.64, 4.32, 3.85}};
         double [] vectorB = {13.05, 10.30, 17.89};
